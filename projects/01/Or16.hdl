@@ -1,0 +1,64 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/01/Or16.hdl
+
+/**
+ * 16-bit bitwise Or:
+ * for i = 0..15 out[i] = (a[i] or b[i])
+ */
+
+CHIP Or16 {
+    IN a[16], b[16];
+    OUT out[16];
+
+    PARTS:
+    Nand(a = a[0], b = a[0], out = outtempA0);
+    Nand(a = b[0], b = b[0], out = outtempB0);
+    Nand(a = outtempA0, b = outtempB0, out = out[0]);
+    Nand(a = a[1], b = a[1], out = outtempA1);
+    Nand(a = b[1], b = b[1], out = outtempB1);
+    Nand(a = outtempA1, b = outtempB1, out = out[1]);
+    Nand(a = a[2], b = a[2], out = outtempA2);
+    Nand(a = b[2], b = b[2], out = outtempB2);
+    Nand(a = outtempA2, b = outtempB2, out = out[2]);
+    Nand(a = a[3], b = a[3], out = outtempA3);
+    Nand(a = b[3], b = b[3], out = outtempB3);
+    Nand(a = outtempA3, b = outtempB3, out = out[3]);
+    Nand(a = a[4], b = a[4], out = outtempA4);
+    Nand(a = b[4], b = b[4], out = outtempB4);
+    Nand(a = outtempA4, b = outtempB4, out = out[4]);
+    Nand(a = a[5], b = a[5], out = outtempA5);
+    Nand(a = b[5], b = b[5], out = outtempB5);
+    Nand(a = outtempA5, b = outtempB5, out = out[5]);
+    Nand(a = a[6], b = a[6], out = outtempA6);
+    Nand(a = b[6], b = b[6], out = outtempB6);
+    Nand(a = outtempA6, b = outtempB6, out = out[6]);
+    Nand(a = a[7], b = a[7], out = outtempA7);
+    Nand(a = b[7], b = b[7], out = outtempB7);
+    Nand(a = outtempA7, b = outtempB7, out = out[7]);
+    Nand(a = a[8], b = a[8], out = outtempA8);
+    Nand(a = b[8], b = b[8], out = outtempB8);
+    Nand(a = outtempA8, b = outtempB8, out = out[8]);
+    Nand(a = a[9], b = a[9], out = outtempA9);
+    Nand(a = b[9], b = b[9], out = outtempB9);
+    Nand(a = outtempA9, b = outtempB9, out = out[9]);
+    Nand(a = a[10], b = a[10], out = outtempA10);
+    Nand(a = b[10], b = b[10], out = outtempB10);
+    Nand(a = outtempA10, b = outtempB10, out = out[10]);
+    Nand(a = a[11], b = a[11], out = outtempA11);
+    Nand(a = b[11], b = b[11], out = outtempB11);
+    Nand(a = outtempA11, b = outtempB11, out = out[11]);
+    Nand(a = a[12], b = a[12], out = outtempA12);
+    Nand(a = b[12], b = b[12], out = outtempB12);
+    Nand(a = outtempA12, b = outtempB12, out = out[12]);
+    Nand(a = a[13], b = a[13], out = outtempA13);
+    Nand(a = b[13], b = b[13], out = outtempB13);
+    Nand(a = outtempA13, b = outtempB13, out = out[13]);
+    Nand(a = a[14], b = a[14], out = outtempA14);
+    Nand(a = b[14], b = b[14], out = outtempB14);
+    Nand(a = outtempA14, b = outtempB14, out = out[14]);
+    Nand(a = a[15], b = a[15], out = outtempA15);
+    Nand(a = b[15], b = b[15], out = outtempB15);
+    Nand(a = outtempA15, b = outtempB15, out = out[15]);
+}
