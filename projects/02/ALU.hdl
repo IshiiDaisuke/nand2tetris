@@ -7,7 +7,7 @@
  * The ALU (Arithmetic Logic Unit).
  * Computes one of the following functions:
  * x+y, x-y, y-x, 0, 1, -1, x, y, -x, -y, !x, !y,
- * x+1, y+1, x-1, y-1, x&y, x|y on two 16-bit inputs, 
+ * x+1, y+1, x-1, y-1, x&y, x|y on two 16-bit inputs,
  * according to 6 input bits denoted zx,nx,zy,ny,f,no.
  * In addition, the ALU computes two 1-bit outputs:
  * if the ALU output == 0, zr is set to 1; otherwise zr is set to 0;
@@ -27,8 +27,8 @@
 // if (out < 0) set ng = 1
 
 CHIP ALU {
-    IN  
-        x[16], y[16],  // 16-bit inputs        
+    IN
+        x[16], y[16],  // 16-bit inputs
         zx, // zero the x input?
         nx, // negate the x input?
         zy, // zero the y input?
@@ -36,11 +36,38 @@ CHIP ALU {
         f,  // compute out = x + y (if 1) or x & y (if 0)
         no; // negate the out output?
 
-    OUT 
+    OUT
         out[16], // 16-bit output
         zr, // 1 if (out == 0), 0 otherwise
         ng; // 1 if (out < 0),  0 otherwise
 
     PARTS:
-   // Put you code here:
+    /** Initial **/
+    //if(zx) -> x[16] == [0,0,0,...,0]
+    Mux16(a = x, b[0..15] = false, sel = zx, out = AZX); //AfterZeroX
+    //if(nx) -> x[16] == !x[16]
+    Not16(in = AZX, out = ANX); //AfterNotX
+    Mux16(a = AZX, b = ANX, sel = nx, out = IX); //InitialX
+
+    //if(zy) -> y[16] == [0,0,0,...,0]
+    Mux16(a = y, b[0..15] = false, sel = zy, out = AZY); //AfterZeroY
+    //if(ny) -> y[16] == !y[16]
+    Not16(in = AZY, out = ANY); //AfterNotY
+    Mux16(a = AZY, b = ANY, sel = ny, out = IY); //InitialY
+
+    /** Function **/
+    //if(f) -> x+y, else x&y
+    Add16(a = IX, b = IY, out = AddXY);
+    And16(a = IX, b = IY, out = AndXY);
+    Mux16(a = AndXY, b = AddXY, sel = f, out = AFXY); //AfterFunctionXY
+
+    /** BeforeOutput **/
+    //if(no) -> !(AFXY), if(oout<0) set ng
+    Not16(in = AFXY, out = NAFXY); //NegateAfterFunctionXY
+    Mux16(a = AFXY, b = NAFXY, sel = no, out = out, out[0..7] = aout, out[8..15] = bout, out[15] = ng);
+    //if(out == 0) set zr
+    Or8Way(in = aout, out = zr1);
+    Or8Way(in = bout, out = zr2);
+    Or(a = zr1, b = zr2, out = any);
+    Not(in = any, out = zr);
 }
