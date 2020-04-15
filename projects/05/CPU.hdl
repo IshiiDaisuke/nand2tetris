@@ -6,23 +6,23 @@
 /**
  * The Hack CPU (Central Processing unit), consisting of an ALU,
  * two registers named A and D, and a program counter named PC.
- * The CPU is designed to fetch and execute instructions written in 
+ * The CPU is designed to fetch and execute instructions written in
  * the Hack machine language. In particular, functions as follows:
- * Executes the inputted instruction according to the Hack machine 
+ * Executes the inputted instruction according to the Hack machine
  * language specification. The D and A in the language specification
  * refer to CPU-resident registers, while M refers to the external
- * memory location addressed by A, i.e. to Memory[A]. The inM input 
- * holds the value of this location. If the current instruction needs 
- * to write a value to M, the value is placed in outM, the address 
- * of the target location is placed in the addressM output, and the 
- * writeM control bit is asserted. (When writeM==0, any value may 
- * appear in outM). The outM and writeM outputs are combinational: 
- * they are affected instantaneously by the execution of the current 
- * instruction. The addressM and pc outputs are clocked: although they 
- * are affected by the execution of the current instruction, they commit 
- * to their new values only in the next time step. If reset==1 then the 
- * CPU jumps to address 0 (i.e. pc is set to 0 in next time step) rather 
- * than to the address resulting from executing the current instruction. 
+ * memory location addressed by A, i.e. to Memory[A]. The inM input
+ * holds the value of this location. If the current instruction needs
+ * to write a value to M, the value is placed in outM, the address
+ * of the target location is placed in the addressM output, and the
+ * writeM control bit is asserted. (When writeM==0, any value may
+ * appear in outM). The outM and writeM outputs are combinational:
+ * they are affected instantaneously by the execution of the current
+ * instruction. The addressM and pc outputs are clocked: although they
+ * are affected by the execution of the current instruction, they commit
+ * to their new values only in the next time step. If reset==1 then the
+ * CPU jumps to address 0 (i.e. pc is set to 0 in next time step) rather
+ * than to the address resulting from executing the current instruction.
  */
 
 CHIP CPU {
@@ -34,10 +34,68 @@ CHIP CPU {
                          // the current program (reset==0).
 
     OUT outM[16],        // M value output
-        writeM,          // Write to M? 
+        writeM,          // Write to M?
         addressM[15],    // Address in data memory (of M)
         pc[15];          // address of next instruction
 
     PARTS:
-    // Put your code here:
+    /* 1stMux */
+    DMux(in = true, sel = instruction[15], a = Aorder, b = Corder);
+    Mux16(a = instruction, b = ALUout, sel = Corder, out = fstMuxout);
+
+    /* Aregister */
+    Or(a=Aorder, b=instruction[5], out=AregisterOn);
+    ARegister(in=fstMuxout, load=AregisterOn, out=AREGIout, out[0..14]=addressM);
+
+    /* 2ndMux */ //if(a=0) use ARegister, (a=1) use memory
+    Mux16(a=AREGIout, b=inM, sel=instruction[12], out=secMuxout);
+
+    /* Dregister */
+    And(a = instruction[4], b = Corder, out = DregisterOn);
+    DRegister(in = ALUout, load = DregisterOn, out = DREGIout);
+
+    /* ALU */
+    ALU(x = DREGIout,
+        y = secMuxout,
+
+        zx = instruction[11],
+        nx = instruction[10],
+        zy = instruction[9],
+        ny = instruction[8],
+        f = instruction[7],
+        no = instruction[6],
+
+        out = ALUout,
+        out = outM,
+        zr = zr,
+        ng = ng
+    );
+
+    And(a = instruction[3], b = instruction[15], out = writeM);
+
+    // if(j1,out < 0) -> 1
+    And(a = ng, b = instruction[2], out = j1true);
+    // if(j2,out = 0) -> 1
+    And(a = zr, b = instruction[1], out = j2true);
+    // if(j3,out > 0) -> 1
+    // (out>0) == !(ng+zr)
+    Or(a = ng, b = zr, out = notplus);
+    Not(in = notplus, out = plus);
+    And(a = plus, b = instruction[0], out = j3true);
+
+    // if(Aorder) -> pcInc=1
+    // if(j1j2j3 == 0) -> pcInc=1
+    // else -> pcLoad
+    Or(a = j1true, b = j2true, out = j12true);
+    Or(a = j12true, b = j3true, out = j123true);
+    And(a = j123true, b = instruction[15], out = pcLoad);
+    Not(in = pcLoad, out = pcInc);
+
+    PC(
+        in = AREGIout,
+        inc = pcInc,
+        load = pcLoad,
+        reset = reset,
+        out[0..14] = pc
+    );
 }
