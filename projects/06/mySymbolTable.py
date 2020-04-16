@@ -2,8 +2,10 @@ import os
 import myParser
 import myCode
 class Meclass:
-    # def constructor():
+
     def __init__(self):
+        あらかじめ
+        # 定義されていたのでそれ通りに入力
         self.Symboldic = {
         "SP": 0x0000,
 		"LCL": 0x0001,
@@ -31,7 +33,7 @@ class Meclass:
         }
         return
 
-
+# ここらへんは言われたとおりにやっただけ
     def addEntry(self,symbol, address):
         self.Symboldic[symbol] = address
         return

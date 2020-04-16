@@ -4,25 +4,23 @@ import mySymbolTable
 
 class Myclass:
     def __init__(self):
-    # def constructor():
         # read
         FileName = input("plz_input_filename...:")
-        FileName = "pong/Pong.asm"
+        print("outputfile = now directry")
+        # ファイルが存在しているかの確認
         if os.path.isfile(FileName):
             Assembler_data = open(FileName, "r")
             self.LineList = Assembler_data.readlines()
-            self.NowLine = 0  # add
+            self.NowLine = 0
 
             Assembler_data.close()
-            # return LineList
         else:
             print("\n...\n")
             print("...\n")
             print("...\n")
             print("Notfound...\n\n")
 
-
-    # def CleanLineList(self.LineList):
+# コメントアウト//や改行記号、空白を消している
     def CleanLineList(self):
         for linenum in range(len(self.LineList)):
             self.LineList[linenum] = self.LineList[linenum].rstrip()
@@ -31,59 +29,41 @@ class Myclass:
         for linenum in range(len(self.LineList)):
             if (self.LineList[linenum][0] == "/"):
                 del self.LineList[linenum]
+                # [0]の場合-1するとメモリ外に出るため再帰
                 if linenum == 0:
-                    # return Cleanself.LineList(self.LineList)
                     return self.CleanLineList()
                 else:
                     linenum = linenum - 1
                     continue
             else:
                 if(0 <= self.LineList[linenum].find("/")):
+                    # ごり押し文字検索->削除
                     self.LineList[linenum] = self.LineList[linenum][:self.LineList[linenum].find("/")]
-                # for strnum in range(len(self.LineList[linenum])):
-                #     print(self.LineList[linenum][strnum])
-                #     if self.LineList[linenum][strnum] == "/":
-                #         # if self.LineList[linenum][strnum+1] == "/":
-                #         self.LineList[linenum] = self.LineList[linenum][:strnum]
-        # return self.LineList
 
 
-    # def hasMoreCommands(self.LineList,self.NowLine):
     def hasMoreCommands(self):
         if len(self.LineList) == self.NowLine:
-            return 0  # false
+            return 0
         else:
-            # advance(self.NowLine)
-            return 1  # true
+            return 1
 
 
-    # def advance(self.NowLine):
     def advance(self):
         self.NowLine = self.NowLine + 1
 
 
-    # def commandType(self.LineList,self.NowLine):
     def commandType(self):
         if self.LineList[self.NowLine][0] == "@":
             self.command = "A_COMMAND"
-            # symbol()
-            # symbol(self.LineList,self.NowLine,command)
         elif self.LineList[self.NowLine][0] == "(":
             self.command = "L_COMMAND"
-            # symbol()
-            # symbol(self.LineList,self.NowLine)
         else:
             self.command = "C_COMMAND"
-            # dest()
-            # comp()
-            # jump()
-            # dest(self.LineList,self.NowLine)
-            # comp(self.LineList,self.NowLine)
-            # jump(self.LineList,self.NowLine)
         return self.command
 
 
     def symbol(self):
+        # replaceは破壊的作業じゃないらしいから代入して壊した
         cmd = self.LineList[self.NowLine]
         if self.command == "A_COMMAND":
             cmd = cmd.replace('@','',1)
@@ -91,16 +71,8 @@ class Myclass:
             cmd = cmd.replace('(','')
             cmd = cmd.replace(')','')
         return cmd
-    # def symbol(self.LineList,self.NowLine,command):
-    #     if self.command == "A_COMMAND":
-    #         self.LineList[self.NowLine].remove('@')
-    #     elif self.command == "L_COMMAND":
-    #         self.LineList[self.NowLine].remove('(')
-    #         self.LineList[self.NowLine].remove(')')
-    #     return self.LineList[self.NowLine]
 
 
-    # def dest(self.LineList,self.NowLine):
     def dest(self):
         if "=" in self.LineList[self.NowLine]:
             eq = self.LineList[self.NowLine].index("=")
@@ -110,12 +82,13 @@ class Myclass:
             return "null"
 
 
-    # def comp(self.LineList,self.NowLine):
     def comp(self):
+        # 基本的なC命令かな
         if "=" in self.LineList[self.NowLine]:
             eq = self.LineList[self.NowLine].index("=")
             Cnimo = self.LineList[self.NowLine][eq+1:]
             return Cnimo
+        # 0;JMTみたいなのに対して、0を取得するため
         elif ";" in self.LineList[self.NowLine]:
             semi = self.LineList[self.NowLine].index(";")
             Cnimo = self.LineList[self.NowLine][:semi]
@@ -124,8 +97,8 @@ class Myclass:
             return "null"
 
 
-    # def jump(self.LineList,self.NowLine):
     def jump(self):
+        # C命令のJを取る場合
         if ";" in self.LineList[self.NowLine]:
             semi = self.LineList[self.NowLine].index(";")
             Jnimo = self.LineList[self.NowLine][semi+1:]

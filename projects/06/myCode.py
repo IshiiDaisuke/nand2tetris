@@ -2,7 +2,7 @@ import os
 import myParser
 import mySymbolTable
 
-
+# すべて指定された通り入力しただけ
 def dest(Dnimo):
     dest_dic = {
     "null": "000",
