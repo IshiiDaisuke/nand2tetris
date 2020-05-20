@@ -1,8 +1,6 @@
 import os
 import myParser
-import myCode
 class Meclass:
-
     def __init__(self):
         # あらかじめ定義されていたのでそれ通りに入力
         self.Symboldic = {
@@ -32,15 +30,14 @@ class Meclass:
         }
         return
 
-# ここらへんは言われたとおりにやっただけ
-    def addEntry(self,symbol, address):
-        self.Symboldic[symbol] = address
-        return
+
+    def setFileName(self,filename):
+        return 0
 
 
-    def contains(self,symbol):
-        return symbol in self.Symboldic
+    def writeArithmetic(self,command):
+        return 0
 
 
-    def getAddress(self,symbol):
-        return self.Symboldic[symbol]
+    def writePushPop(self,command,segment,index):
+        return 0
